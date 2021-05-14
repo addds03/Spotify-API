@@ -3,6 +3,9 @@ import requests as req
 import datetime
 import base64 as bs64
 
+"""
+Class feches token from Spotify API
+"""
 class GetAccessToken:
     
     token_url = 'https://accounts.spotify.com/api/token'
@@ -42,15 +45,7 @@ class GetAccessToken:
             'grant_type':'client_credentials'
             }
 
-    def perform_authorization(self):
-
-        token_url = self.token_url
-        token_data = self.get_token_data()
-        token_headers = self.get_token_headers()    
-        r = req.post(self.token_url, data=token_data,headers=token_headers)
-
-        if r.status_code not in (200, 201, 202, 204):
-            return False
+    def get_token(self, r):
         data = r.json()
 
         now = datetime.datetime.now()
@@ -58,7 +53,19 @@ class GetAccessToken:
         # time is in seconds
         exp = now + datetime.timedelta(data['expires_in'])
 
-        self.access_token = acess_token
         self.acess_token_expires = exp
         self.access_token_did_expire = exp < now
-        return True    
+
+        return acess_token
+           
+    def perform_authorization(self):
+
+        token_url = self.token_url
+        token_data = self.get_token_data()
+        token_headers = self.get_token_headers()    
+        response = req.post(token_url, data=token_data,headers=token_headers)
+
+        if response.status_code not in (200, 201, 202, 204):
+            return False
+        self.access_token = self.get_token(response)
+        return True
