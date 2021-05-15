@@ -15,6 +15,7 @@ class GetAccessToken:
     access_token = None
     acess_token_expires = datetime.datetime.now()
     access_token_did_expire = True
+    refresh_token = None
 
     def __init__(self, client_id, client_secret, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -42,7 +43,9 @@ class GetAccessToken:
         
     def get_token_data(self):
         return {
-            'grant_type':'client_credentials'
+            'grant_type':'authorization_code',
+            'code':'AQBguKiSIm83nTKfFADqX7_UNUXLUB7y3go3iXp4-StMk9RmPMUWsmfJxdFsUqRCnodAXHe8klCU_pmNX2rwiu7GV8dj_ABf9sVn78GtuOR5T7B0a-MLF2PnwsLwy9mdqCM-L-_IMkNPiBTWXJCK4sMmatIr0xgn5Qmvdiif0RfpnBil3BEHkCMNqoD-',
+            'redirect_uri':'https://addds03.github.io/Addy-Portfolio/' 
             }
 
     def get_token(self, r):
@@ -55,7 +58,7 @@ class GetAccessToken:
 
         self.acess_token_expires = exp
         self.access_token_did_expire = exp < now
-
+        self.refresh_token = data['refresh_token']
         return acess_token
            
     def perform_authorization(self):
@@ -64,8 +67,21 @@ class GetAccessToken:
         token_data = self.get_token_data()
         token_headers = self.get_token_headers()    
         response = req.post(token_url, data=token_data,headers=token_headers)
-
+   
         if response.status_code not in (200, 201, 202, 204):
             return False
         self.access_token = self.get_token(response)
         return True
+
+
+# if __name__ == '__main__':
+
+#     client_id = 'f6809b3b21a44a2b9279c36507f78c15'
+#     client_secret = '19b35fc517c744afa580df79b89136e2'
+
+#     token = GetAccessToken(client_id, client_secret)
+#     token.perform_authorization()
+
+
+
+    
