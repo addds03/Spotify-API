@@ -2,27 +2,28 @@
 import requests as req
 import datetime
 import base64 as bs64
+import json
 
 """
-Class feches token from Spotify API
+Class fetches token from Spotify API
 """
 class GetAccessToken:
     
     token_url = 'https://accounts.spotify.com/api/token'
     client_id = None
     client_secret = None    
+    auth_code = None
     
-    access_token = None
+    
     acess_token_expires = datetime.datetime.now()
-    access_token_did_expire = True
-    refresh_token = None
 
-    def __init__(self, client_id, client_secret, *args, **kwargs):
+    def __init__(self, auth_code, client_id, client_secret, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.auth_code = auth_code
         self.client_id = client_id
         self.client_secret = client_secret
 
-    def get_client_credentials(self):
+    def get_client_credential(self):
         """
         Returns a base64 encoded string
         """
@@ -35,42 +36,66 @@ class GetAccessToken:
         client_cred64 = bs64.b64encode(client_credentials.encode())
         return client_cred64.decode()
 
-    def get_token_headers(self):
-        client_cred64 = self.get_client_credentials()
+    def generate_header(self):
+        """
+        Generates request header
+        """
+        client_cred64 = self.get_client_credential()
         return {
             'Authorization': f'Basic {client_cred64}'
             }
         
-    def get_token_data(self):
+    def generate_body_para(self):
+        """
+        Generates body request parameters
+        """
+        code = self.auth_code
         return {
             'grant_type':'authorization_code',
-            'code':'AQBguKiSIm83nTKfFADqX7_UNUXLUB7y3go3iXp4-StMk9RmPMUWsmfJxdFsUqRCnodAXHe8klCU_pmNX2rwiu7GV8dj_ABf9sVn78GtuOR5T7B0a-MLF2PnwsLwy9mdqCM-L-_IMkNPiBTWXJCK4sMmatIr0xgn5Qmvdiif0RfpnBil3BEHkCMNqoD-',
+            'code': code,
             'redirect_uri':'https://addds03.github.io/Addy-Portfolio/' 
             }
 
-    def get_token(self, r):
+    
+    def write_token(self, r):
+        """
+        Writes the access and refresh tokens to a file
+        """
         data = r.json()
-
         now = datetime.datetime.now()
+        sec = data['expires_in']
+        acess_token_expires = now + datetime.timedelta(seconds = sec)
+        
         acess_token = data['access_token']
-        # time is in seconds
-        exp = now + datetime.timedelta(data['expires_in'])
+        refresh_token = data['refresh_token']
 
-        self.acess_token_expires = exp
-        self.access_token_did_expire = exp < now
-        self.refresh_token = data['refresh_token']
-        return acess_token
+        token = {
+            'access_token' : acess_token,
+            'token_received_at' : now,
+            'token_expires_in' : sec,
+            'token_expires_at' : acess_token_expires,
+            'refresh_token' : refresh_token
+            }
+  
+        def myconverter(o):
+            if isinstance(o, datetime.datetime):
+                return o.__str__()
+
+        with open('codebase/credentials/token.json', 'w') as outfile:
+            json.dump(token, outfile, default=myconverter, indent=4)        
            
-    def perform_authorization(self):
+    def get_tokens(self):
 
         token_url = self.token_url
-        token_data = self.get_token_data()
-        token_headers = self.get_token_headers()    
-        response = req.post(token_url, data=token_data,headers=token_headers)
+        body_para = self.generate_body_para()
+        headers = self.generate_header()
+        response = req.post(token_url, data=body_para,headers=headers)
    
         if response.status_code not in (200, 201, 202, 204):
             return False
-        self.access_token = self.get_token(response)
+        
+        # writes access token and refresh tokens to a file
+        self.write_token(response)
         return True
 
 
@@ -81,7 +106,6 @@ class GetAccessToken:
 
 #     token = GetAccessToken(client_id, client_secret)
 #     token.perform_authorization()
-
 
 
     
