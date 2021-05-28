@@ -1,6 +1,6 @@
 
 import requests as req
-import datetime
+import datetime as dt
 import base64 as bs64
 import json
 
@@ -13,15 +13,17 @@ class GetAccessToken:
     client_id = None
     client_secret = None    
     auth_code = None
+    grant_type = None
     
     
-    acess_token_expires = datetime.datetime.now()
+    acess_token_expires = dt.datetime.now()
 
     def __init__(self, auth_code, client_id, client_secret, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        #super().__init__(*args, **kwargs)
         self.auth_code = auth_code
         self.client_id = client_id
         self.client_secret = client_secret
+        self.grant_type = args[0]
 
     def get_client_credential(self):
         """
@@ -49,25 +51,34 @@ class GetAccessToken:
         """
         Generates body request parameters
         """
+        grant_type = self.grant_type
         code = self.auth_code
-        return {
-            'grant_type':'authorization_code',
+        if grant_type == 'authorization_code':
+            return {
+            'grant_type': grant_type,
             'code': code,
             'redirect_uri':'https://addds03.github.io/Addy-Portfolio/' 
             }
-
+        elif grant_type == 'refresh_token':
+            return {
+            'grant_type': grant_type,
+            'refresh_token' : code
+            }        
     
     def write_token(self, r):
         """
         Writes the access and refresh tokens to a file
         """
         data = r.json()
-        now = datetime.datetime.now()
+        now = dt.datetime.now()
         sec = data['expires_in']
-        acess_token_expires = now + datetime.timedelta(seconds = sec)
+        acess_token_expires = now + dt.timedelta(seconds = sec)
         
+        refresh_token = None
         acess_token = data['access_token']
-        refresh_token = data['refresh_token']
+        
+        if self.grant_type != 'refresh_token':
+            refresh_token = data['refresh_token']
 
         token = {
             'access_token' : acess_token,
@@ -78,7 +89,7 @@ class GetAccessToken:
             }
   
         def myconverter(o):
-            if isinstance(o, datetime.datetime):
+            if isinstance(o, dt.datetime):
                 return o.__str__()
 
         with open('codebase/credentials/token.json', 'w') as outfile:
@@ -89,7 +100,7 @@ class GetAccessToken:
         token_url = self.token_url
         body_para = self.generate_body_para()
         headers = self.generate_header()
-        response = req.post(token_url, data=body_para,headers=headers)
+        response = req.post(token_url, data=body_para, headers=headers)
    
         if response.status_code not in (200, 201, 202, 204):
             return False
@@ -97,15 +108,3 @@ class GetAccessToken:
         # writes access token and refresh tokens to a file
         self.write_token(response)
         return True
-
-
-# if __name__ == '__main__':
-
-#     client_id = 'f6809b3b21a44a2b9279c36507f78c15'
-#     client_secret = '19b35fc517c744afa580df79b89136e2'
-
-#     token = GetAccessToken(client_id, client_secret)
-#     token.perform_authorization()
-
-
-    
