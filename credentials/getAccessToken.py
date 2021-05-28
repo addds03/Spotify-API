@@ -95,7 +95,7 @@ class GetAccessToken:
         with open('codebase/credentials/token.json', 'w') as outfile:
             json.dump(token, outfile, default=myconverter, indent=4)        
            
-    def get_tokens(self):
+    def token_request(self):
 
         token_url = self.token_url
         body_para = self.generate_body_para()
