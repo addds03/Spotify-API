@@ -4,6 +4,7 @@ import json
 import csv
 import requests as req
 import pandas as pd
+pd.options.mode.chained_assignment = None
 from credentials.getAccessToken import GetAccessToken
 
 def write_audio_features(id, token, writer):
@@ -65,7 +66,7 @@ def istokenexpired(data):
     expires_at = dt.datetime.fromisoformat(data['token_expires_at'])
     return now > expires_at
 
-# Issue of 1st time token not yet resolved
+# Issue of 1st time token not yet resolved (TypeError: 'NoneType' object is not subscriptable)
 def get_token(auth_code):
     """
     Performs authorization and requests for access token or refresh token based on token expiry
@@ -126,11 +127,11 @@ if __name__ == '__main__':
     df_streams = pd.read_csv('MyData/mystreams.csv')
     distinct_tracks = df_streams.drop_duplicates(subset='track_name')
     distinct_tracks['track_id'] = distinct_tracks['track_name'].apply(get_trackID, token=access_token)         
-    distinct_tracks.drop(columns=['end_time','artist_name','milliseconds','played,minutes','played','date','time','day','month'], axis=1, inplace=True)
-    distinct_tracks.to_csv('MyData/trackIds.csv', index= False)
-   
+    distinct_tracks.drop(columns=['end_time','artist_name','milliseconds_played','minutes_played','date','time','day','month'], inplace=True, axis=1)
+    distinct_tracks.to_csv('MyData/track_id.csv', index=False)
+
     # request for audio features
-    audio_features = open('MyData/audio_features.csv', 'w', newline= '', encoding='UTF-16')
+    audio_features = open('MyData/audio_features.csv', 'w', newline= '')
     dataWriter = csv.writer(audio_features)
     dataWriter.writerow(['id','danceability','energy','key','loud','mode','speech','acoustics',
                         'instrumentals','liveness','valence','tempo'])
