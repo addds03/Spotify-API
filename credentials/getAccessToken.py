@@ -14,57 +14,15 @@ class GetAccessToken:
     client_secret = None    
     auth_code = None
     grant_type = None
-    
-    
+        
     acess_token_expires = dt.datetime.now()
 
     def __init__(self, auth_code, client_id, client_secret, *args, **kwargs):
-        #super().__init__(*args, **kwargs)
         self.auth_code = auth_code
         self.client_id = client_id
         self.client_secret = client_secret
         self.grant_type = args[0]
 
-    def get_client_credential(self):
-        """
-        Returns a base64 encoded string
-        """
-        client_id = self.client_id
-        client_secret = self.client_secret
-
-        if client_id == None or client_secret == None:
-            raise Exception('You must set Client id & Client secret')
-        client_credentials = f'{client_id}:{client_secret}'
-        client_cred64 = bs64.b64encode(client_credentials.encode())
-        return client_cred64.decode()
-
-    def generate_header(self):
-        """
-        Generates request header
-        """
-        client_cred64 = self.get_client_credential()
-        return {
-            'Authorization': f'Basic {client_cred64}'
-            }
-        
-    def generate_body_para(self):
-        """
-        Generates body request parameters
-        """
-        grant_type = self.grant_type
-        code = self.auth_code
-        if grant_type == 'authorization_code':
-            return {
-            'grant_type': grant_type,
-            'code': code,
-            'redirect_uri':'https://addds03.github.io/Addy-Portfolio/' 
-            }
-        elif grant_type == 'refresh_token':
-            return {
-            'grant_type': grant_type,
-            'refresh_token' : code
-            }        
-    
     def write_token(self, r):
         """
         Writes the access and refresh tokens to a file
@@ -94,7 +52,48 @@ class GetAccessToken:
 
         with open('codebase/credentials/token.json', 'w') as outfile:
             json.dump(token, outfile, default=myconverter, indent=4)        
-           
+
+    
+    def get_client_credential(self):
+        """
+        Returns a base64 encoded string
+        """
+        client_id = self.client_id
+        client_secret = self.client_secret
+
+        if client_id == None or client_secret == None:
+            raise Exception('You must set Client id & Client secret')
+        client_credentials = f'{client_id}:{client_secret}'
+        client_cred64 = bs64.b64encode(client_credentials.encode())
+        return client_cred64.decode()
+
+    def generate_header(self):
+        """
+        Generates request header
+        """
+        client_cred64 = self.get_client_credential()
+        return {
+            'Authorization': f'Basic {client_cred64}'
+            }
+
+    def generate_body_para(self):
+        """
+        Generates body request parameters
+        """
+        grant_type = self.grant_type
+        code = self.auth_code
+        if grant_type == 'authorization_code':
+            return {
+            'grant_type': grant_type,
+            'code': code,
+            'redirect_uri':'https://addds03.github.io/Addy-Portfolio/' 
+            }
+        elif grant_type == 'refresh_token':
+            return {
+            'grant_type': grant_type,
+            'refresh_token' : code
+            }        
+
     def token_request(self):
 
         token_url = self.token_url
