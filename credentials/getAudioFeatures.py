@@ -5,7 +5,7 @@ import csv
 import requests as req
 import pandas as pd
 pd.options.mode.chained_assignment = None
-from credentials.getAccessToken import GetAccessToken
+from getAccessToken import GetAccessToken
 
 def write_audio_features(id, token, writer):
     """
@@ -87,7 +87,7 @@ def get_token(auth_code):
                     if not token_class.token_request():
                         raise Exception('Use getAuthCode.ipynb to change the authorization code in config file')
             except FileNotFoundError:
-                print('token file not found')
+                print('Token file not found')
     
     return data['access_token']
 
