@@ -24,7 +24,7 @@
 
 ## Exploratory Data Analysis
 
-![timeline](https://user-images.githubusercontent.com/39771193/121780781-d927ba80-cb6f-11eb-9a64-9aea7b1f3e4a.png)
+![timeline](https://user-images.githubusercontent.com/39771193/121780981-bd70e400-cb70-11eb-90e2-b3dc6b41e250.png)
 
 <!--- ![Boring](https://user-images.githubusercontent.com/39771193/121780778-d7f68d80-cb6f-11eb-916d-747a52a347dc.png)
 ![Diversity](https://user-images.githubusercontent.com/39771193/121780779-d88f2400-cb6f-11eb-9f48-6379070dcb9b.png)
