@@ -10,7 +10,7 @@
 * **Packages:** pandas, numpy, requests.  
 * **Visualizations:** matplotlib, seaborn, plotly express, plotly graph objects      
 * **Tools:** Ms Visual Code, Spotify API.   
-* **Story:** https://aditya-gaikwad3.medium.com/how-much-i-listen-to-music-is-my-music-diverse-analyzing-my-spotify-streaming-history-804afffc18b5
+* **Article:** https://aditya-gaikwad3.medium.com/how-much-i-listen-to-music-is-my-music-diverse-analyzing-my-spotify-streaming-history-804afffc18b5
 
 
 ## Data Collection
