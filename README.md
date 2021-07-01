@@ -1,4 +1,4 @@
-# Analyzing my Spotify streaming history: Overview (In Progess)
+# Exploring Spotify Listening Habits: Overview (In Progess)
 
 * Summary
 * Writing
